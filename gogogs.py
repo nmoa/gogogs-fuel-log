@@ -4,6 +4,7 @@ import argparse
 import io
 import os
 import re
+import sys
 import requests
 
 import numpy as np
@@ -75,26 +76,61 @@ def sendToWorksheet(df, wks, row_origin, col_origin):
     return
 
 
-def main(page_number: int):
-    df = fetchRefuelHistory(page_number)
+def main(args):
+    df = fetchRefuelHistory(args.page)
     df = df.drop("単価", axis=1).drop("利用金額", axis=1)
 
-    gc = gspread.service_account()
-    ss = gc.open("走行距離")
-    wks = ss.sheet1
+    if args.mode == "csv":
+        # CSV出力モード
+        # sys.stdoutへ出力
+        df.to_csv(sys.stdout, header=args.csv_header, index=False)
+        return
 
-    date_list = wks.col_values(1)
-    last_refuel_date = date_list[-1]
-    df_extracted = df[df["給油日"] > last_refuel_date]
-    if len(df_extracted) > 0:
-        last_row = len(date_list)
-        # gspreadのcellのインデックスは1から始まることに注意
-        sendToWorksheet(df_extracted, wks, last_row + 1, 1)
-    print("{} data written.".format(df_extracted.shape[0]))
+    elif args.mode == "gspread":
+        # Google Spreadsheet書き込みモード
+        if args.gspread_auth:
+            gc = gspread.service_account(filename=args.gspread_auth)
+        else:
+            gc = gspread.service_account()
+
+        ss = gc.open("走行距離")
+        wks = ss.sheet1
+
+        date_list = wks.col_values(1)
+        if not date_list:
+             # シートが空の場合は全データを書き込むために、比較用の日付をありえない古い日付にする
+             last_refuel_date = "1900/01/01"
+        else:
+             last_refuel_date = date_list[-1]
+
+        df_extracted = df[df["給油日"] > last_refuel_date]
+        if len(df_extracted) > 0:
+            last_row = len(date_list)
+            # gspreadのcellのインデックスは1から始まることに注意
+            sendToWorksheet(df_extracted, wks, last_row + 1, 1)
+        print("{} data written.".format(df_extracted.shape[0]))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--page", type=int, default=1)
+    parser.add_argument("-p", "--page", type=int, default=1, help="Page number to fetch")
+    parser.add_argument(
+        "-m",
+        "--mode",
+        choices=["csv", "gspread"],
+        default="gspread",
+        help="Output mode: csv or gspread (default: gspread)",
+    )
+    parser.add_argument(
+        "--csv-header",
+        action="store_true",
+        help="Include header row in CSV output",
+    )
+    parser.add_argument(
+        "--gspread-auth",
+        type=str,
+        default=None,
+        help="Path to Google service account JSON file",
+    )
     args = parser.parse_args()
-    main(args.page)
+    main(args)

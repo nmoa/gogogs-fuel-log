@@ -5,11 +5,15 @@ import io
 import os
 import re
 import sys
+import time
 import requests
 
+from dotenv import load_dotenv
 import numpy as np
 import pandas as pd
 import gspread
+
+load_dotenv()
 
 
 def fetchRefuelHistory(page_number: int) -> pd.DataFrame:
@@ -20,24 +24,50 @@ def fetchRefuelHistory(page_number: int) -> pd.DataFrame:
     return df
 
 
+def _create_session() -> requests.Session:
+    """
+    gogo.gsへの認証済みセッションを作成する
+    """
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept-encoding": "gzip",
+    })
+    session.cookies.set("u_id", os.environ["GOGOGS_U_ID"], domain="my.gogo.gs")
+    session.cookies.set("u_id_key", os.environ["GOGOGS_U_ID_KEY"], domain="my.gogo.gs")
+    # Laravelのログイン永続化Cookie (remember_web_*)
+    if os.environ.get("GOGOGS_REMEMBER_TOKEN"):
+        session.cookies.set(
+            "remember_web_59ba36addc2b2f9401580f014c7f58ea4e30989d",
+            os.environ["GOGOGS_REMEMBER_TOKEN"],
+            domain="my.gogo.gs",
+        )
+    return session
+
+
+# モジュールレベルでセッションを保持（複数ページ取得時にCookieを維持）
+_session = None
+
+
+def _get_session() -> requests.Session:
+    global _session
+    if _session is None:
+        _session = _create_session()
+    return _session
+
+
 def fetchGogoGsMyCarPageAsHtml(page_number):
     """
     gogo.gsの燃費・給油履歴のページをhtmlとして取得する
     """
-    if page_number == 1:
-        page_string = ""
-    else:
-        page_string = "&page={}".format(page_number)
+    mycar_id = os.environ["GOGOGS_MYCAR_ID"]
+    url = f"https://my.gogo.gs/refuel/log/{mycar_id}"
+    if page_number > 1:
+        url += f"?page={page_number}"
 
-    url = f"https://my.gogo.gs/refuel/log/?mycar_id={os.environ['GOGOGS_MYCAR_ID']}{page_string}"
-
-    headers = {"User-Agent": "Magic Browser", "Accept-encoding": "gzip"}
-    cookie = {
-        "u_id": os.environ["GOGOGS_U_ID"],
-        "u_id_key": os.environ["GOGOGS_U_ID_KEY"],
-    }
-    request = requests.get(url=url, headers=headers, cookies=cookie)
-    return request.content
+    session = _get_session()
+    response = session.get(url=url)
+    return response.content
 
 
 def extractRefuelHistory(html_binary) -> pd.DataFrame:
@@ -49,6 +79,19 @@ def extractRefuelHistory(html_binary) -> pd.DataFrame:
     html_unit_dropped = re.sub(r"(Km \/ L|Km|L)", "", html_str)
     dfs = pd.read_html(io.StringIO(html_unit_dropped), flavor="bs4", header=0)
     return dfs[0]
+
+
+def detectTotalPages() -> int:
+    """
+    1ページ目のHTMLからページネーションを解析し、最終ページ番号を返す
+    """
+    html = fetchGogoGsMyCarPageAsHtml(1)
+    html_str = html.decode("utf-8")
+    # ページネーションのリンクから最大ページ番号を検出
+    page_numbers = re.findall(r'[?&]page=(\d+)', html_str)
+    if page_numbers:
+        return max(int(p) for p in page_numbers)
+    return 1
 
 
 def formatDataFrameForPaste(df):
@@ -77,7 +120,25 @@ def sendToWorksheet(df, wks, row_origin, col_origin):
 
 
 def main(args):
-    df = fetchRefuelHistory(args.page)
+    start_page = args.page
+    if args.all:
+        print("全ページ数を検出中...", file=sys.stderr)
+        end_page = detectTotalPages()
+        print(f"全 {end_page} ページを取得します", file=sys.stderr)
+    elif args.end_page:
+        end_page = args.end_page
+    else:
+        end_page = start_page
+
+    dfs = []
+    for p in range(start_page, end_page + 1):
+        print(f"ページ {p}/{end_page} を取得中...", file=sys.stderr)
+        df = fetchRefuelHistory(p)
+        dfs.append(df)
+        if p < end_page:
+            time.sleep(1)  # サイト側への負荷軽減
+
+    df = pd.concat(dfs, ignore_index=True)
     df = df.drop("単価", axis=1).drop("利用金額", axis=1)
 
     if args.mode == "csv":
@@ -113,7 +174,18 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--page", type=int, default=1, help="Page number to fetch")
+    parser.add_argument("-p", "--page", type=int, default=1, help="取得開始ページ番号 (default: 1)")
+    parser.add_argument(
+        "--end-page",
+        type=int,
+        default=None,
+        help="取得終了ページ番号 (指定しない場合は --page のみ)",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="全ページを取得",
+    )
     parser.add_argument(
         "-m",
         "--mode",

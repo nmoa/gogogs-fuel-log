@@ -76,9 +76,13 @@ uv run gogogs.py
 | 引数 | 説明 |
 | :--- | :--- |
 | `-m`, `--mode` | 出力モードを指定します (`gspread` または `csv`)。デフォルトは `gspread`。 |
-| `-p`, `--page` | 取得するページ番号を指定します。デフォルトは `1`。 |
+| `-p`, `--page` | 取得開始ページ番号を指定します。デフォルトは `1`。 |
+| `--end-page` | 取得終了ページ番号を指定します。`--page` と組み合わせて範囲指定できます。 |
+| `--all` | 全ページを自動で取得します。ページ数はサイトから自動検出されます。 |
 | `--csv-header` | CSVモード時、ヘッダー行を含めて出力します。 |
 | `--gspread-auth` | Google サービスアカウントの JSON キーファイルのパスを指定します。 |
+
+> **Note**: 複数ページ取得時は、サイトへの負荷軽減のためページ間に1秒の待機時間を設けています。
 
 ### 実行例
 
@@ -91,6 +95,12 @@ uv run gogogs.py --mode csv --csv-header > fuel_log.csv
 
 # 過去のデータをCSV出力（ヘッダーなし）
 uv run gogogs.py --mode csv --page 2
+
+# ページ1〜3を一括取得してCSV出力
+uv run gogogs.py --mode csv --csv-header --page 1 --end-page 3 > fuel_log.csv
+
+# 全ページを一括取得してCSV出力
+uv run gogogs.py --mode csv --csv-header --all > fuel_log_all.csv
 ```
 
 #### Google スプレッドシートの認証ファイルを指定する場合

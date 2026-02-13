@@ -12,18 +12,18 @@ gogo.gs (ゴーゴージーエス) のマイカー給油履歴をスクレイピ
 
 このツールを使用するには、以下の準備が必要です。
 
-1. **Python 3.x** の環境
+1. **[uv](https://docs.astral.sh/uv/)** — Python パッケージマネージャー
 2. **gogo.gs のアカウント**（給油記録があること）
 3. **Google Cloud Platform (GCP) サービスアカウント**（スプレッドシート書き込み用）
 
 ## セットアップ
 
-### 1. ライブラリのインストール
+### 1. 依存パッケージのインストール
 
-必要な Python ライブラリをインストールします。
+`uv` を使って依存パッケージをインストールします。Python のバージョンも自動で管理されます。
 
 ```bash
-pip install requests pandas numpy gspread beautifulsoup4 html5lib
+uv sync
 ```
 
 ### 2. 環境変数の設定 (.env)
@@ -39,7 +39,7 @@ cp .env.example .env
 #### `GOGOGS_MYCAR_ID` の取得
 1. gogo.gs にログインし、自分の車種の「給油履歴」ページを開きます。
 2. URL を確認し、`mycar_id=` の後ろにある数字をコピーします。
-   - URL例: `https://my.gogo.gs/refuel/log/?mycar_id=12345` → `12345`
+   - URL例: `https://my.gogo.gs/refuel/log/12345` → `12345`
 
 #### `GOGOGS_U_ID` および `GOGOGS_U_ID_KEY` の取得 (Cookie)
 gogo.gs は API を公開していないため、ブラウザの Cookie を使用して認証します。
@@ -68,7 +68,7 @@ gogo.gs は API を公開していないため、ブラウザの Cookie を使�
 
 ```bash
 # デフォルト実行（スプレッドシートへの同期）
-python gogogs.py
+uv run gogogs.py
 ```
 
 ### オプション
@@ -87,15 +87,15 @@ python gogogs.py
 
 ```bash
 # 最新1ページ分をヘッダー付きでCSV出力
-python gogogs.py --mode csv --csv-header > fuel_log.csv
+uv run gogogs.py --mode csv --csv-header > fuel_log.csv
 
 # 過去のデータをCSV出力（ヘッダーなし）
-python gogogs.py --mode csv --page 2
+uv run gogogs.py --mode csv --page 2
 ```
 
 #### Google スプレッドシートの認証ファイルを指定する場合
 デフォルトの場所（`~/.config/gspread/service_account.json` など）以外にある JSON ファイルを使用する場合に指定します。
 
 ```bash
-python gogogs.py --gspread-auth /path/to/your-service-account.json
+uv run gogogs.py --gspread-auth /path/to/your-service-account.json
 ```

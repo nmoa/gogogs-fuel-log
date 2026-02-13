@@ -1,0 +1,13 @@
+[project]
+name = "gogogs-fuel-log"
+version = "0.1.0"
+description = "gogo.gs のマイカー給油履歴をスクレイピングし、Google スプレッドシートに同期する Python スクリプト"
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "gspread>=6.2.1",
+    "html5lib>=1.1",
+    "numpy>=2.4.2",
+    "pandas>=3.0.0",
+    "requests>=2.32.5",
+]

@@ -20,7 +20,7 @@ def fetchRefuelHistory(page_number: int) -> pd.DataFrame:
     html = fetchGogoGsMyCarPageAsHtml(page_number)
     df = extractRefuelHistory(html)
     df["総走行距離"] = df["総走行距離"].astype(dtype=int)
-    df.sort_values(by="給油日", ascending=True, inplace=True)
+    df.sort_values(by="総走行距離", ascending=True, inplace=True)
     return df
 
 
@@ -100,7 +100,7 @@ def formatDataFrameForPaste(df):
     """
     df["総走行距離"] = df["総走行距離"].astype(dtype=int)
     df = df.drop("単価", axis=1).drop("利用金額", axis=1)
-    return df.sort_values(by="給油日", ascending=True)
+    return df.sort_values(by="総走行距離", ascending=True)
 
 
 def sendToWorksheet(df, wks, row_origin, col_origin):
@@ -139,12 +139,26 @@ def main(args):
             time.sleep(1)  # サイト側への負荷軽減
 
     df = pd.concat(dfs, ignore_index=True)
+    df.sort_values(by="総走行距離", ascending=True, inplace=True)
     df = df.drop("単価", axis=1).drop("利用金額", axis=1)
 
     if args.mode == "csv":
         # CSV出力モード
-        # sys.stdoutへ出力
-        df.to_csv(sys.stdout, header=args.csv_header, index=False)
+        output_path = args.output
+        if args.append and os.path.isfile(output_path):
+            # 既存CSVを読み込み、新規データとマージ
+            df_existing = pd.read_csv(output_path)
+            new_count_before = len(df)
+            df = pd.concat([df_existing, df], ignore_index=True)
+            df.drop_duplicates(subset=["総走行距離"], keep="last", inplace=True)
+            df.sort_values(by="総走行距離", ascending=True, inplace=True)
+            added = len(df) - len(df_existing)
+            print(f"既存 {len(df_existing)} 件 + 新規 {added} 件 → 合計 {len(df)} 件")
+            # appendモードではヘッダーを常に付与（既存ファイルとの整合性のため）
+            df.to_csv(output_path, header=True, index=False)
+        else:
+            df.to_csv(output_path, header=not args.no_csv_header, index=False)
+        print(f"CSV written to {output_path}")
         return
 
     elif args.mode == "gspread":
@@ -190,19 +204,32 @@ if __name__ == "__main__":
         "-m",
         "--mode",
         choices=["csv", "gspread"],
-        default="gspread",
-        help="Output mode: csv or gspread (default: gspread)",
+        default="csv",
+        help="Output mode: csv or gspread (default: csv)",
     )
     parser.add_argument(
-        "--csv-header",
+        "--no-csv-header",
         action="store_true",
-        help="Include header row in CSV output",
+        help="CSVモード時、ヘッダー行を除外して出力します",
     )
     parser.add_argument(
         "--gspread-auth",
         type=str,
         default=None,
         help="Path to Google service account JSON file",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default="fuel_log.csv",
+        help="Output CSV file path (default: fuel_log.csv)",
+    )
+    parser.add_argument(
+        "-a",
+        "--append",
+        action="store_true",
+        help="既存CSVにデータを追記（総走行距離で重複排除）",
     )
     args = parser.parse_args()
     main(args)

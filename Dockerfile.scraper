@@ -1,0 +1,15 @@
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+WORKDIR /app
+
+# Copy dependency definition files
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies statically
+RUN uv sync --frozen
+
+# Copy the actual script
+COPY gogogs.py ./
+
+# Execute the script periodically using an environment variable
+CMD ["sh", "-c", "while true; do uv run python gogogs.py -a; echo \"Sleeping for ${UPDATE_INTERVAL_SECONDS} seconds...\"; sleep ${UPDATE_INTERVAL_SECONDS}; done"]

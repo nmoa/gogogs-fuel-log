@@ -1,0 +1,42 @@
+services:
+  grafana:
+    image: grafana/grafana-oss:11.5.2
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+    ports:
+      - "8080:8080"
+    environment:
+      - CSV_PATH=/data/fuel_log.csv
+    volumes:
+      - ./fuel_log.csv:/data/fuel_log.csv:ro
+
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    environment:
+      - UPDATE_INTERVAL_SECONDS=86400  # Default to 24 hours
+    env_file:
+      - .env
+    volumes:
+      - ./fuel_log.csv:/app/fuel_log.csv
+    restart: unless-stopped
+
+volumes:
+  grafana-storage:

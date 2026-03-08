@@ -17,5 +17,9 @@
     "remoteUser": "vscode",
     "remoteEnv": {
         "PATH": "/home/vscode/.local/bin:${containerEnv:PATH}"
-    }
+    },
+    "forwardPorts": [
+        3000,
+        8080
+    ]
 }

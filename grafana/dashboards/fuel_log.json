@@ -1,0 +1,636 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "id": null,
+    "links": [],
+    "panels": [
+        {
+            "id": 1,
+            "title": "燃費推移 (km/L)",
+            "description": "各給油時の燃費。追加給油・未入力のレコードは除外。",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 10,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisLabel": "燃費 (km/L)",
+                        "drawStyle": "line",
+                        "fillOpacity": 15,
+                        "gradientMode": "scheme",
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 2,
+                        "pointSize": 5,
+                        "showPoints": "auto",
+                        "spanNulls": true
+                    },
+                    "unit": "km/L",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "red",
+                                "value": null
+                            },
+                            {
+                                "color": "orange",
+                                "value": 10
+                            },
+                            {
+                                "color": "green",
+                                "value": 14
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom"
+                },
+                "tooltip": {
+                    "mode": "single"
+                }
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data/efficiency",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "fuel_efficiency",
+                            "text": "燃費",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "title": "平均燃費",
+            "description": "全期間の平均燃費",
+            "type": "stat",
+            "gridPos": {
+                "h": 5,
+                "w": 6,
+                "x": 0,
+                "y": 10
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "unit": "km/L",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "red",
+                                "value": null
+                            },
+                            {
+                                "color": "orange",
+                                "value": 10
+                            },
+                            {
+                                "color": "green",
+                                "value": 13
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "/^燃費$/",
+                    "values": false
+                },
+                "colorMode": "background",
+                "graphMode": "area",
+                "textMode": "auto",
+                "justifyMode": "auto"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data/efficiency",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "fuel_efficiency",
+                            "text": "燃費",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "title": "総給油量",
+            "description": "全期間の合計給油量",
+            "type": "stat",
+            "gridPos": {
+                "h": 5,
+                "w": 6,
+                "x": 6,
+                "y": 10
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "unit": "L",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "blue",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "/^給油量$/",
+                    "values": false
+                },
+                "colorMode": "background",
+                "graphMode": "none",
+                "textMode": "auto",
+                "justifyMode": "auto"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "refuel_amount",
+                            "text": "給油量",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "title": "総走行距離",
+            "description": "現在の総走行距離",
+            "type": "stat",
+            "gridPos": {
+                "h": 5,
+                "w": 6,
+                "x": 12,
+                "y": 10
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "unit": "km",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "purple",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "/^総走行距離$/",
+                    "values": false
+                },
+                "colorMode": "background",
+                "graphMode": "area",
+                "textMode": "auto",
+                "justifyMode": "auto"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "total_mileage",
+                            "text": "総走行距離",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 13,
+            "title": "給油回数",
+            "description": "総給油回数",
+            "type": "stat",
+            "gridPos": {
+                "h": 5,
+                "w": 6,
+                "x": 18,
+                "y": 10
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "unit": "回",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "super-light-green",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "reduceOptions": {
+                    "calcs": [
+                        "count"
+                    ],
+                    "fields": "/^給油量$/",
+                    "values": false
+                },
+                "colorMode": "background",
+                "graphMode": "none",
+                "textMode": "auto",
+                "justifyMode": "auto"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "refuel_amount",
+                            "text": "給油量",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "title": "給油量推移 (L)",
+            "description": "各給油時の給油量",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 0,
+                "y": 15
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#37872D",
+                        "mode": "fixed"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisLabel": "給油量 (L)",
+                        "drawStyle": "bars",
+                        "fillOpacity": 60,
+                        "gradientMode": "hue",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "showPoints": "never"
+                    },
+                    "unit": "L"
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom"
+                },
+                "tooltip": {
+                    "mode": "single"
+                }
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "refuel_amount",
+                            "text": "給油量",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "title": "1回あたり走行距離 (km)",
+            "description": "各給油間の走行距離",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 9,
+                "w": 12,
+                "x": 12,
+                "y": 15
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#FF9830",
+                        "mode": "fixed"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisLabel": "走行距離 (km)",
+                        "drawStyle": "bars",
+                        "fillOpacity": 60,
+                        "gradientMode": "hue",
+                        "lineWidth": 1,
+                        "pointSize": 5,
+                        "showPoints": "never"
+                    },
+                    "unit": "km"
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom"
+                },
+                "tooltip": {
+                    "mode": "single"
+                }
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "distance",
+                            "text": "走行距離",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "title": "総走行距離推移 (km)",
+            "description": "累計走行距離の推移",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 24
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": ""
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "#8F3BB8",
+                        "mode": "fixed"
+                    },
+                    "custom": {
+                        "axisBorderShow": false,
+                        "axisCenteredZero": false,
+                        "axisLabel": "総走行距離 (km)",
+                        "drawStyle": "line",
+                        "fillOpacity": 20,
+                        "gradientMode": "scheme",
+                        "lineInterpolation": "smooth",
+                        "lineWidth": 2,
+                        "pointSize": 4,
+                        "showPoints": "auto"
+                    },
+                    "unit": "km"
+                },
+                "overrides": []
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "list",
+                    "placement": "bottom"
+                },
+                "tooltip": {
+                    "mode": "single"
+                }
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": ""
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "total_mileage",
+                            "text": "総走行距離",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        }
+    ],
+    "schemaVersion": 39,
+    "tags": [
+        "fuel",
+        "car"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "2019-01-01T00:00:00.000Z",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "Asia/Tokyo",
+    "title": "燃費・給油ログ",
+    "uid": "fuel-log-dashboard",
+    "version": 1
+}

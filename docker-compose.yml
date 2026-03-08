@@ -26,5 +26,17 @@ services:
     volumes:
       - ./fuel_log.csv:/data/fuel_log.csv:ro
 
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    environment:
+      - UPDATE_INTERVAL_SECONDS=86400  # Default to 24 hours
+    env_file:
+      - .env
+    volumes:
+      - ./fuel_log.csv:/app/fuel_log.csv
+    restart: unless-stopped
+
 volumes:
   grafana-storage:

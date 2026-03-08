@@ -77,6 +77,30 @@ def get_data():
     return jsonify(records)
 
 
+@app.route("/api/data/monthly")
+def get_monthly_data():
+    """Return total distance and refuel amount grouped by month."""
+    records = load_csv()
+    from collections import defaultdict
+    monthly = defaultdict(lambda: {"distance": 0.0, "refuel_amount": 0.0})
+    for r in records:
+        if not r["date"]: continue
+        month = r["date"][:7] # YYYY-MM
+        if r["distance"]:
+            monthly[month]["distance"] += r["distance"]
+        if r["refuel_amount"]:
+            monthly[month]["refuel_amount"] += r["refuel_amount"]
+    
+    result = []
+    for month in sorted(monthly.keys()):
+        result.append({
+            "date": f"{month}-01T00:00:00Z",
+            "distance": round(monthly[month]["distance"], 1),
+            "refuel_amount": round(monthly[month]["refuel_amount"], 2)
+        })
+    return jsonify(result)
+
+
 @app.route("/api/data/efficiency")
 def get_efficiency():
     """Return only records with valid fuel efficiency (for cleaner charts)."""

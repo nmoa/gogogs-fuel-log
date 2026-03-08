@@ -17,11 +17,11 @@
                 "h": 10,
                 "w": 24,
                 "x": 0,
-                "y": 0
+                "y": 9
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -76,10 +76,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data/efficiency",
                     "root_selector": "",
                     "columns": [
@@ -105,13 +108,13 @@
             "type": "stat",
             "gridPos": {
                 "h": 5,
-                "w": 6,
+                "w": 5,
                 "x": 0,
-                "y": 10
+                "y": 19
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -157,10 +160,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data/efficiency",
                     "root_selector": "",
                     "columns": [
@@ -186,13 +192,13 @@
             "type": "stat",
             "gridPos": {
                 "h": 5,
-                "w": 6,
-                "x": 6,
-                "y": 10
+                "w": 5,
+                "x": 5,
+                "y": 19
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -230,10 +236,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data",
                     "root_selector": "",
                     "columns": [
@@ -253,19 +262,95 @@
             ]
         },
         {
+            "id": 14,
+            "title": "期間内走行距離",
+            "description": "表示期間内の走行距離の合計",
+            "type": "stat",
+            "gridPos": {
+                "h": 5,
+                "w": 5,
+                "x": 10,
+                "y": 19
+            },
+            "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "fuel-log-api"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "unit": "km",
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "orange",
+                                "value": null
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "options": {
+                "reduceOptions": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "fields": "/^走行距離$/",
+                    "values": false
+                },
+                "colorMode": "background",
+                "graphMode": "none",
+                "textMode": "auto",
+                "justifyMode": "auto"
+            },
+            "targets": [
+                {
+                    "refId": "A",
+                    "datasource": {
+                        "type": "yesoreyeram-infinity-datasource",
+                        "uid": "fuel-log-api"
+                    },
+                    "type": "json",
+                    "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "url": "http://api:8080/api/data",
+                    "root_selector": "",
+                    "columns": [
+                        {
+                            "selector": "date",
+                            "text": "Date",
+                            "type": "timestamp"
+                        },
+                        {
+                            "selector": "distance",
+                            "text": "走行距離",
+                            "type": "number"
+                        }
+                    ],
+                    "format": "timeseries"
+                }
+            ]
+        },
+        {
             "id": 12,
             "title": "総走行距離",
             "description": "現在の総走行距離",
             "type": "stat",
             "gridPos": {
                 "h": 5,
-                "w": 6,
-                "x": 12,
-                "y": 10
+                "w": 5,
+                "x": 15,
+                "y": 19
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -303,10 +388,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data",
                     "root_selector": "",
                     "columns": [
@@ -332,13 +420,13 @@
             "type": "stat",
             "gridPos": {
                 "h": 5,
-                "w": 6,
-                "x": 18,
-                "y": 10
+                "w": 4,
+                "x": 20,
+                "y": 19
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -376,10 +464,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data",
                     "root_selector": "",
                     "columns": [
@@ -400,18 +491,18 @@
         },
         {
             "id": 2,
-            "title": "給油量推移 (L)",
-            "description": "各給油時の給油量",
+            "title": "月ごとの給油量 (L)",
+            "description": "各月の合計給油量",
             "type": "timeseries",
             "gridPos": {
                 "h": 9,
-                "w": 12,
+                "w": 24,
                 "x": 0,
-                "y": 15
+                "y": 24
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -448,11 +539,14 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
-                    "url": "http://api:8080/api/data",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "url": "http://api:8080/api/data/monthly",
                     "root_selector": "",
                     "columns": [
                         {
@@ -472,18 +566,18 @@
         },
         {
             "id": 3,
-            "title": "1回あたり走行距離 (km)",
-            "description": "各給油間の走行距離",
+            "title": "月ごとの走行距離 (km)",
+            "description": "各月の合計走行距離",
             "type": "timeseries",
             "gridPos": {
                 "h": 9,
                 "w": 12,
-                "x": 12,
-                "y": 15
+                "x": 0,
+                "y": 0
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -520,11 +614,14 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
-                    "url": "http://api:8080/api/data",
+                    "url_options": {
+                        "method": "GET"
+                    },
+                    "url": "http://api:8080/api/data/monthly",
                     "root_selector": "",
                     "columns": [
                         {
@@ -549,13 +646,13 @@
             "type": "timeseries",
             "gridPos": {
                 "h": 9,
-                "w": 24,
-                "x": 0,
-                "y": 24
+                "w": 12,
+                "x": 12,
+                "y": 0
             },
             "datasource": {
                 "type": "yesoreyeram-infinity-datasource",
-                "uid": ""
+                "uid": "fuel-log-api"
             },
             "fieldConfig": {
                 "defaults": {
@@ -593,10 +690,13 @@
                     "refId": "A",
                     "datasource": {
                         "type": "yesoreyeram-infinity-datasource",
-                        "uid": ""
+                        "uid": "fuel-log-api"
                     },
                     "type": "json",
                     "source": "url",
+                    "url_options": {
+                        "method": "GET"
+                    },
                     "url": "http://api:8080/api/data",
                     "root_selector": "",
                     "columns": [

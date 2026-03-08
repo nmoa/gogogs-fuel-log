@@ -3,6 +3,7 @@ apiVersion: 1
 datasources:
   - name: Fuel Log API
     type: yesoreyeram-infinity-datasource
+    uid: fuel-log-api
     access: proxy
     isDefault: true
     jsonData:

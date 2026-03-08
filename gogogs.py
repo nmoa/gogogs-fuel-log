@@ -9,7 +9,6 @@ import time
 import requests
 
 from dotenv import load_dotenv
-import numpy as np
 import pandas as pd
 import gspread
 
@@ -104,12 +103,10 @@ def formatDataFrameForPaste(df):
 
 
 def sendToWorksheet(df, wks, row_origin, col_origin):
-    arr = np.asarray(df)
-    row_cnt = arr.shape[0]
-    col_cnt = arr.shape[1]
-    flatted_arr = (
-        arr.flatten()
-    )  # cell_listが1次元のため貼り付けデータも1次元にする必要がある
+    row_cnt = len(df)
+    col_cnt = len(df.columns)
+    # cell_listが1次元のため貼り付けデータも1次元にする必要がある
+    flatted_arr = [item for row in df.values.tolist() for item in row]
     cell_list = wks.range(
         row_origin, col_origin, row_origin + row_cnt - 1, col_origin + col_cnt - 1
     )
